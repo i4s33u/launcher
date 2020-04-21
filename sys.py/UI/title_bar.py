@@ -167,11 +167,21 @@ class TitleBar(Widget):
                 return False
                 """
 
-                if "POWER_SUPPLY_CAPACITY" in bat_uevent:
-                    cur_cap = int(bat_uevent["POWER_SUPPLY_CAPACITY"])
+                voltage_now = float(bat_uevent["POWER_SUPPLY_VOLTAGE_NOW"])
+                voltage_min = float(bat_uevent["POWER_SUPPLY_VOLTAGE_MIN_DESIGN"])
+                voltage_max = float(bat_uevent["POWER_SUPPLY_VOLTAGE_MAX_DESIGN"])
+
+                if voltage_now < voltage_min:
+                    self._Icons["battery"] = self._Icons["battery_unknown"]
+                    return False
                 else:
-                    cur_cap = 0
-                    
+                    cur_cap = int(((voltage_now - voltage_min) / (voltage_max - voltage_min)) * 100)
+
+                # if "POWER_SUPPLY_CAPACITY" in bat_uevent:
+                #     cur_cap = int(bat_uevent["POWER_SUPPLY_CAPACITY"])
+                # else:
+                #     cur_cap = 0
+
                 cap_ge = 0
                 
                 for i,v in enumerate(bat_segs):
